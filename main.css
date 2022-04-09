@@ -1,19 +1,26 @@
 .slidecontainer {
-    width: 100%; /* Width of the outside container */
+    display: flex;
+    justify-content: left;
+    width: 50%; /* Width of the outside container */
 }
 
-/* The slider itself */
+
 .slider {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
     -webkit-appearance: none;
-    appearance: none;
-    width: 100%; /* Full-width */
-    height: 25px; /* Specified height */
+    -moz-appearance: none;
+    width: 200px;
+    height: 25px;
     background: #d3d3d3; /* Purple background */
     outline: none; /* Remove outline */
     opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    -webkit-transition: .2s;
+    -moz-transition: .2s;
     transition: opacity .2s;
 }
+
 
 /* Mouse-over effects */
 .slider:hover {

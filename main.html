@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="main.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Can You Synth It?</title>
+</head>
+<body>
+    <button id="start">
+        Start
+    </button>
+    <button id="stop">
+        Stop
+    </button>
+    <br>
+    <span>Master Volume</span>
+    <br>
+    <div class="sliderContainer">
+        <input type="range" min="0" max="1" step="0.05" value="0.1" class="slider" id="volume-control">
+    </div>
+    <br>
+    <input type="radio" id="sin-wave" name="waveform" value="sine"
+           checked>
+    <label for="sin-wave">Sin Wave</label><br>
+    <input type="radio" id="square-wave" name="waveform" value="square">
+    <label for="square-wave">Square Wave</label><br>
+    <input type="radio" id="triangle-wave" name="waveform" value="triangle">
+    <label for="triangle-wave">Triangle Wave</label><br>
+    <input type="radio" id="sawtooth-wave" name="waveform" value="sawtooth">
+    <label for="sawtooth-wave">Sawtooth Wave</label>
+
+
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/webmidi@next/dist/iife/webmidi.iife.js"></script>
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <link rel="stylesheet" href="midi.css">
+    <meta charset="UTF-8">
+    <title>Can You Synth It?</title>
+</head>
+<body>
+    <div id="keyboard"></div>
+    <div id="adsr">
+        <button id="test">
+            Test
+        </button>
+        <br>
+        <span>Master Volume</span>
+        <br>
+        <div class="sliderContainer">
+            <input type="range" min="-48" max="0" step="0.5" value="-12" class="slider" id="volume-control">
+        </div>
+        <br>
+        <span>ADSR</span>
+        <br>
+        <div class="sliderContainer">
+            <label for="attack-control">Attack</label>
+            <input type="range" min="0" max="1" step="0.05" value="0.1" class="slider" id="attack-control">
+            <label for="decay-control">Decay</label>
+            <input type="range" min="0" max="1" step="0.05" value="0.1" class="slider" id="decay-control">
+            <label for="sustain-control">Sustain</label>
+            <input type="range" min="0" max="1" step="0.05" value="0.1" class="slider" id="sustain-control">
+            <label for="release-control">Release</label>
+            <input type="range" min="0" max="1" step="0.05" value="0.1" class="slider" id="release-control">
+            <br>
+        </div>
+        <br>
+    </div>
+
+    <script type="text/javascript">
+        class ADSR {
+            constructor (atk, dec, sus, rel) {
+                this.attack = atk;
+                this.decay = dec;
+                this.sustain = sus;
+                this.release = rel;
+            }
+        }
+
+        //Parameters
+        const synth = new Tone.PolySynth().toDestination();
+
+        //Buttons
+        const test_button  = document.querySelector('#test');
+
+        //Sliders
+        const volume_slider  = document.querySelector('#volume-control');
+        const attack_slider  = document.querySelector('#attack-control');
+        const decay_slider   = document.querySelector('#decay-control');
+        const sustain_slider = document.querySelector('#sustain-control');
+        const release_slider = document.querySelector('#release-control');
+
+        console.log(volume_slider.value);
+        test_button.addEventListener('click', function() {
+            console.log(volume_slider.value);
+        });
+
+        //Initialization
+        const envelope = new ADSR(parseFloat(attack_slider.value),
+            parseFloat(decay_slider.value),
+            parseFloat(sustain_slider.value),
+            parseFloat(release_slider.value));
+
+        volume_slider.addEventListener('input', function(){
+            console.log(volume_slider.value);
+            // synth.volume.value = this.value;
+        });
+
+        attack_slider.addEventListener('input', function(){
+            console.log(volume_slider.value);
+            envelope.attack = (parseFloat(this.value));
+        });
+        decay_slider.addEventListener('input', function(){
+            envelope.decay = (parseFloat(this.value));
+        });
+        sustain_slider.addEventListener('input', function(){
+            envelope.sustain = (parseFloat(this.value));
+        });
+        release_slider.addEventListener('input', function(){
+            envelope.release = (parseFloat(this.value));
+        });
+
+
+        // Enable WebMidi.js and trigger the onEnabled() function when ready
+        WebMidi
+            .enable()
+            .then(() => {
+                if(WebMidi.inputs.length < 1) {
+                    console.log("No device detected");
+                } else {
+                    WebMidi.inputs.forEach((device, index) => {
+                        document.body.innerHTML+= `${index}: ${device.name} <br>`;
+                    });
+                }
+                let device = WebMidi.inputs[0];
+                // const mySynth = WebMidi.getInputByName("TYPE NAME HERE!")
+
+                device.channels[1].addListener("noteon", e => {
+                    document.body.innerHTML+= `${e.note.identifier} <br>`;
+                    //const data-note = ${e.note.identifier};
+                    noteDown(e.note.identifier);
+                });
+            })
+            .catch(err => alert(err));
+
+
+
+
+        let html = "";
+        let notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        for(var octave = 0; octave < 2; octave++) {
+            for(let i = 0; i < notes.length; i++) {
+                const note = notes[i];
+                const hasSharp = (['E','B'].indexOf(note) == -1);
+                html += `<div class='whiteNote' onmousedown='virtualNoteDown(this, false)'
+                         onmouseup="virtualNoteUp(this, false)"
+                         onmouseleave="virtualNoteUp(this,false)"
+                         data-note='${note + (octave+4)}'>`;
+                if(hasSharp) {
+                    html += `<div class='blackNote' onmousedown='virtualNoteDown(this, true)'
+                         onmouseup="virtualNoteUp(this, true)"
+                         onmouseleave="virtualNoteUp(this,true)"
+                         data-note='${note + '#' + (octave+4)}'></div>`;
+
+                }
+
+                html += `</div>`;
+            }
+        }
+
+        document.querySelector('#keyboard').innerHTML = html;
+
+        function virtualNoteUp(elem, isSharp) {
+            elem.style.background = isSharp ? '#777' : '';
+        }
+
+        function virtualNoteDown(elem, isSharp) {
+            const note = elem.dataset.note;
+            noteDown(note);
+            elem.style.background = isSharp ? 'black' : '#ccc';
+
+        }
+
+        function noteUp(note) {
+        }
+
+        function noteDown(note) {
+            synth.triggerAttackRelease(note, "8n");
+            event.stopPropagation();
+        }
+    </script>
+</body>
+</html>
